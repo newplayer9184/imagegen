@@ -14,38 +14,49 @@
 
 import streamlit as st
 from streamlit.logger import get_logger
-
+import openai
 LOGGER = get_logger(__name__)
 
-
-def run():
+def generate_image(prompt):
+  client=openai.OpenAI(api_key=st.secrets["openai_api_key"])
+  response=client.images.generate(
+    prompt=prompt,
+    n=1,
+    size="256x256"
+  )
+  image_url= response.data[0].url
+  return image_url
+def image_gen() -> None:
     st.set_page_config(
-        page_title="Hello",
+        page_title="Hello i make image",
         page_icon="👋",
     )
+    st.markdown("# Think of something")
+    st.button("Run")
 
-    st.write("# Welcome to Streamlit! 👋")
+    input_text = st.text_area("What image would you like to generate?")
+    run_button=st.button("Run")
 
-    st.sidebar.success("Select a demo above.")
-
-    st.markdown(
-        """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
-    )
+    if run_button and input_text.strip() != "":
+      with st.spinner("Buffering"):
+        image_url = generate_image(input_text)
+        st.image(image_url)
+    else:
+        st.warning("No input.")
+    st.image("https;//i.redd.it/vton9zwqv3f61.jpg")
 
 
+    prompt= f"Help me generate an image based on the following: {image_style} {animal} {activity},with some additional information: {input_text}. Make sure it's interesting"
+image_gen()
+    
+
+#need add col stuff
 if __name__ == "__main__":
     run()
+def run():
+  st.set_page_config(
+    page_title="OpenAI"
+    page_icon=""
+  )
+  st.title("Generate an image!")
+  col1,col2=st.columns([3,5])
